@@ -91,7 +91,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
 
     const totalCount = await postCollection
         .countDocuments(filter)
-
+const result = totalCount - 1
     const pageCount = Math.ceil(totalCount / +pageSize)
 
     console.log(blog,'blog')
@@ -103,7 +103,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
                 pagesCount:pageCount,
                 page:+pageNumber,
                 pageSize:+pageSize,
-                totalCount:totalCount - 1,
+                totalCount:result,
                 items:blogs.map(postMapper)})
         return;
     } else {
