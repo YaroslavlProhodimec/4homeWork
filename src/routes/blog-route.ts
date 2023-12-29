@@ -44,20 +44,10 @@ blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) =>
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
 })
-
 blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
-    const id = req.params.id
-    // const blog = await BlogRepository.getBlogById(id)
-    // const sortData = {
-    //     searchNameTerm: req.query.searchNameTerm,
-    //     sortBy: req.query.sortBy,
-    //     sortDirection: req.query.sortDirection,
-    //     pageNumber: req.query.pageNumber,
-    //     pageSize: req.query.pageSize,
-    // }
-
+    const id = req.params.id;
     const blog = await BlogRepository.getBlogById(id);
-    // pagesCount":1,"page":1,"pageSize":10,"totalCount":3,
+
     const sortData = {
         searchNameTerm: req.query.searchNameTerm,
         sortBy: req.query.sortBy,
@@ -66,13 +56,13 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         pageSize: Number(req.query.pageSize) || 10,
     };
 
-    const sortDirection = sortData.sortDirection ?? 'desc'
-    const sortBy = sortData.sortBy ?? 'createdAt'
-    const searchNameTerm = sortData.searchNameTerm ?? null
-    const pageSize = sortData.pageSize ?? 10
-    const pageNumber = sortData.pageNumber ?? 1
+    const sortDirection = sortData.sortDirection ?? 'desc';
+    const sortBy = sortData.sortBy ?? 'createdAt';
+    const searchNameTerm = sortData.searchNameTerm ?? null;
+    const pageSize = sortData.pageSize ?? 10;
+    const pageNumber = sortData.pageNumber ?? 1;
 
-    let filter = {}
+    let filter = {};
 
     if (searchNameTerm) {
         filter = {
@@ -80,36 +70,152 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
                 $regex: searchNameTerm,
                 $options: 'i'
             }
-        }
+        };
     }
-    console.log(pageNumber,'pageNumber')
+
     const blogs: any = await postCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
         .limit(+pageSize)
-        .toArray()
+        .toArray();
 
-    const totalCount = await blogCollection
-        .countDocuments(filter)
+    const totalCount = await blogCollection.countDocuments(filter);
+    const pageCount = Math.ceil(+totalCount / +pageSize);
 
-    const pageCount = Math.ceil(+totalCount / +pageSize)
-
-    console.log(blog,'blog')
+    console.log(blog, 'blog');
 
     if (blog) {
-        res.status(HTTP_STATUSES.OK_200
-            // CREATED_201
-        ).json({
-                pagesCount:pageCount,
-                page:+pageNumber,
-                pageSize:+pageSize,
-                totalCount:+totalCount,
-                items:blogs.map(postMapper)})
+        res.status(HTTP_STATUSES.OK_200).json({
+            pagesCount: pageCount,
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: +totalCount,
+            items: blogs.map(postMapper)
+        });
         return;
     } else {
-        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
     }
-})
+});
+blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const blog = await BlogRepository.getBlogById(id);
+
+    const sortData = {
+        searchNameTerm: req.query.searchNameTerm,
+        sortBy: req.query.sortBy,
+        sortDirection: req.query.sortDirection,
+        pageNumber: Number(req.query.pageNumber) || 1,
+        pageSize: Number(req.query.pageSize) || 10,
+    };
+
+    const sortDirection = sortData.sortDirection ?? 'desc';
+    const sortBy = sortData.sortBy ?? 'createdAt';
+    const searchNameTerm = sortData.searchNameTerm ?? null;
+    const pageSize = sortData.pageSize ?? 10;
+    const pageNumber = sortData.pageNumber ?? 1;
+
+    let filter = {};
+
+    if (searchNameTerm) {
+        filter = {
+            name: {
+                $regex: searchNameTerm,
+                $options: 'i'
+            }
+        };
+    }
+
+    const blogs: any = await postCollection.find(filter)
+        .sort(sortBy, sortDirection)
+        .skip((+pageNumber - 1) * +pageSize)
+        .limit(+pageSize)
+        .toArray();
+
+    const totalCount = await blogCollection.countDocuments(filter);
+    const pageCount = Math.ceil(+totalCount / +pageSize);
+
+    console.log(blog, 'blog');
+
+    if (blog) {
+        res.status(HTTP_STATUSES.OK_200).json({
+            pagesCount: pageCount,
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: +totalCount,
+            items: blogs.map(postMapper)
+        });
+        return;
+    } else {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
+    }
+});
+
+// blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
+//     const id = req.params.id
+//     // const blog = await BlogRepository.getBlogById(id)
+//     // const sortData = {
+//     //     searchNameTerm: req.query.searchNameTerm,
+//     //     sortBy: req.query.sortBy,
+//     //     sortDirection: req.query.sortDirection,
+//     //     pageNumber: req.query.pageNumber,
+//     //     pageSize: req.query.pageSize,
+//     // }
+//
+//     const blog = await BlogRepository.getBlogById(id);
+//     // pagesCount":1,"page":1,"pageSize":10,"totalCount":3,
+//     const sortData = {
+//         searchNameTerm: req.query.searchNameTerm,
+//         sortBy: req.query.sortBy,
+//         sortDirection: req.query.sortDirection,
+//         pageNumber: Number(req.query.pageNumber) || 1,
+//         pageSize: Number(req.query.pageSize) || 10,
+//     };
+//
+//     const sortDirection = sortData.sortDirection ?? 'desc'
+//     const sortBy = sortData.sortBy ?? 'createdAt'
+//     const searchNameTerm = sortData.searchNameTerm ?? null
+//     const pageSize = sortData.pageSize ?? 10
+//     const pageNumber = sortData.pageNumber ?? 1
+//
+//     let filter = {}
+//
+//     if (searchNameTerm) {
+//         filter = {
+//             name: {
+//                 $regex: searchNameTerm,
+//                 $options: 'i'
+//             }
+//         }
+//     }
+//     console.log(pageNumber,'pageNumber')
+//     const blogs: any = await postCollection.find(filter)
+//         .sort(sortBy, sortDirection)
+//         .skip((+pageNumber - 1) * +pageSize)
+//         .limit(+pageSize)
+//         .toArray()
+//
+//     const totalCount = await blogCollection
+//         .countDocuments(filter)
+//
+//     const pageCount = Math.ceil(+totalCount / +pageSize)
+//
+//     console.log(blog,'blog')
+//
+//     if (blog) {
+//         res.status(HTTP_STATUSES.OK_200
+//             // CREATED_201
+//         ).json({
+//                 pagesCount:pageCount,
+//                 page:+pageNumber,
+//                 pageSize:+pageSize,
+//                 totalCount:+totalCount,
+//                 items:blogs.map(postMapper)})
+//         return;
+//     } else {
+//         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+//     }
+// })
 
 blogRoute.post('/',
     authMiddleware, blogPostValidation(),
