@@ -99,7 +99,7 @@ export class BlogRepository {
             title:postData.title,
             shortDescription:postData.shortDescription,
             content:postData.content,
-            blogId:postData.blogId,
+            blogId:blogId,
             blogName:blog!.name
         }
         const res =     await postCollection.insertOne(post)
