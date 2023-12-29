@@ -44,7 +44,9 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
     const blog = await BlogRepository.getBlogById(id)
 
     if (blog) {
-        res.status(HTTP_STATUSES.CREATED_201).json(blog)
+        res.status(HTTP_STATUSES.OK_200
+            // CREATED_201
+        ).json(blog)
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
