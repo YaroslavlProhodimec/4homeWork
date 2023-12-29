@@ -97,8 +97,6 @@ export class BlogRepository {
             blogId:postData.blogId,
             blogName:blog!.name
         }
-
-
         const res =     await postCollection.insertOne(post)
 
         return res.insertedId
