@@ -90,6 +90,7 @@ blogRoute.post('/:id/posts',
             res.send(404)
             return;
         }
+
         const createdPostId = await BlogRepository.createPostToBlog(id, {title, shortDescription, content})
         // const blogFound = await BlogRepository.getBlogById(id)
         // if (!blogFound) {

@@ -89,7 +89,12 @@ export class BlogRepository {
     }
     static async createPostToBlog(blogId:string,postData:any){
         const blog = await this.getBlogById(blogId)
-
+        // {"id":"658ecf37c9fe3dbe552d7186",
+        //     "name":"new blog",
+        //     "description":"description",
+        //     "websiteUrl":"https://someurl.com",
+        //     "createdAt":"2023-12-29T13:52:55.790Z",
+        //     "isMembership":false
         const post = {
             title:postData.title,
             shortDescription:postData.shortDescription,
