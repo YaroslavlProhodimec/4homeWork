@@ -4,7 +4,7 @@ export type RequestWithBody<B> = Request<{}, {}, B, {}>
 export type RequestWithQuery<Q> = Request<{}, {},{},Q>
 export type RequestWithBodyAndParams<P, B> = Request<P, {}, B, {}>
 
-export type ResponseType<T> = Response<T,{}>
+// export type ResponseType<T> = Response<T,{}>
 
 
 type  ErrorType = {

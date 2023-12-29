@@ -6,19 +6,29 @@ import {postRoute} from "./routes/post-route";
 import {BlogType} from "./types/blog/output";
 import {PostType} from "./types/post/output";
 import {testingRouter} from "./testing-router";
-import {client, runDb} from "./db/db";
+import {MongoClient} from "mongodb";
 
 // app.use('/testing',testingRouter)
 
 dotenv.config()
-
-
-const port  = 5000
-
-app.use('/blogs',blogRoute)
-app.use('/posts',postRoute)
-app.use('/testing',testingRouter)
 export const mongoURI = process.env.MONGO_URL
+
+// @ts-ignore
+export const client = new MongoClient(mongoURI);
+
+export async function runDb() {
+    try {
+        await client.connect()
+    } catch (e) {
+        await client.close()
+    }
+}
+
+const port = 5000
+
+app.use('/blogs', blogRoute)
+app.use('/posts', postRoute)
+app.use('/testing', testingRouter)
 export const dbBlogs = client.db('node-blogs')
 
 export const blogCollection = dbBlogs.collection<BlogType>('blogs')
@@ -26,8 +36,8 @@ export const postCollection = dbBlogs.collection<PostType>('post')
 
 
 const startApp = async () => {
-    await  runDb()
-    app.listen(port, async ()=>{
+    await runDb()
+    app.listen(port, async () => {
         console.log(`Listen on port ${port}`)
     })
 }
@@ -44,7 +54,6 @@ const startApp = async () => {
 //         res.sendStatus(404)
 //     }
 // });
-
 
 
 startApp()
