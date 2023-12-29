@@ -47,9 +47,7 @@ blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) =>
 
 blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
     const id = req.params.id
-
     // const blog = await BlogRepository.getBlogById(id)
-
     // const sortData = {
     //     searchNameTerm: req.query.searchNameTerm,
     //     sortBy: req.query.sortBy,
@@ -59,14 +57,15 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
     // }
 
     const blog = await BlogRepository.getBlogById(id);
-
+    // pagesCount":1,"page":1,"pageSize":10,"totalCount":3,
     const sortData = {
         searchNameTerm: req.query.searchNameTerm,
         sortBy: req.query.sortBy,
         sortDirection: req.query.sortDirection,
-        pageNumber: Number(req.query.pageNumber) || 1,
+        pageNumber: Number(req.query.page) || 1,
         pageSize: Number(req.query.pageSize) || 10,
     };
+
     const sortDirection = sortData.sortDirection ?? 'desc'
     const sortBy = sortData.sortBy ?? 'createdAt'
     const searchNameTerm = sortData.searchNameTerm ?? null
