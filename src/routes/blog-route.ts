@@ -7,6 +7,7 @@ import {HTTP_STATUSES} from "../utils/common";
 // import {BlogService} from "../domain/blog-service";
 import {RequestWithBodyAndParams, RequestWithQuery} from "../types/common";
 import {PostRepository} from "../repositories/post-repository";
+import {postValidation} from "../validators/post-validator";
 
 type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>
 
@@ -78,6 +79,7 @@ blogRoute.post('/',
    blogRoute.post('/:id/posts',
     authMiddleware,
        // blogPostValidation(),
+       postValidation(),
     async (req: RequestWithBodyAndParams<BlogParams, {
         title: string,
         shortDescription: string,
