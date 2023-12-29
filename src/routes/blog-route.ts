@@ -4,7 +4,7 @@ import {blogPostValidation, idParamsValidation} from "../validators/blogs-valida
 import {authMiddleware} from "../middlewares/auth/auth-middleware";
 import {BlogParams, SortDataType} from "../types/blog/input";
 import {HTTP_STATUSES} from "../utils/common";
-import {BlogService} from "../domain/blog-service";
+// import {BlogService} from "../domain/blog-service";
 import {RequestWithBodyAndParams, RequestWithQuery} from "../types/common";
 
 type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>
@@ -89,7 +89,11 @@ blogRoute.post('/:id/posts',
             res.send(404)
             return;
         }
-        const created = await BlogService.createPostToBlog(id, {title, shortDescription, content})
+        // const created = await BlogService.createPostToBlog(id, {title, shortDescription, content})
+        const blogFound = await BlogRepository.getBlogById(id)
+        if (!blogFound) {
+            res.sendStatus(404)
+        }
 
         res.status(HTTP_STATUSES.OK_200).send(blog)
     })
