@@ -62,7 +62,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         searchNameTerm: req.query.searchNameTerm,
         sortBy: req.query.sortBy,
         sortDirection: req.query.sortDirection,
-        pageNumber: Number(req.query.page) || 1,
+        pageNumber: Number(req.query.pageNumber) || 1,
         pageSize: Number(req.query.pageSize) || 10,
     };
 
