@@ -49,11 +49,19 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
 
     const blog = await BlogRepository.getBlogById(id)
 
-    const sortDirection = req.query.sortDirection ?? 'desc'
-    const sortBy = req.query.sortBy ?? 'createdAt'
-    const searchNameTerm = req.query.searchNameTerm ?? null
-    const pageSize = req.query.pageSize ?? 10
-    const pageNumber = req.query.pageNumber ?? 1
+    const sortData = {
+        searchNameTerm: req.query.searchNameTerm,
+        sortBy: req.query.sortBy,
+        sortDirection: req.query.sortDirection,
+        pageNumber: req.query.pageNumber,
+        pageSize: req.query.pageSize,
+    }
+    const sortDirection = sortData.sortDirection ?? 'desc'
+    const sortBy = sortData.sortBy ?? 'createdAt'
+    const searchNameTerm = sortData.searchNameTerm ?? null
+    const pageSize = sortData.pageSize ?? 10
+    const pageNumber = sortData.pageNumber ?? 1
+
 
     let filter = {}
 
@@ -66,11 +74,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         }
     }
 
-    const blogs: WithId<BlogType>[] = await blogCollection.find(
-        // {
-        filter
-        // }
-    )
+    const blogs: WithId<BlogType>[] = await blogCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
         .limit(+pageSize)
@@ -91,7 +95,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
                 page:+pageNumber,
                 pageSize:+pageSize,
                 totalCount:+totalCount,
-            items:blogs.map(blogMapper)})
+                items:blogs.map(blogMapper)})
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
