@@ -82,12 +82,8 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
             }
         }
     }
-
-    const post: any = await postCollection.find(
-        // {
-        filter
-        // }
-    )
+    console.log(pageNumber,'pageNumber')
+    const blogs: any = await postCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
         .limit(+pageSize)
@@ -96,7 +92,9 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
     const totalCount = await postCollection
         .countDocuments(filter)
 
-    const pageCount = Math.ceil(totalCount / +pageSize)
+    const pageCount = Math.ceil(+totalCount / +pageSize)
+
+    console.log(blog,'blog')
 
     if (blog) {
         res.status(HTTP_STATUSES.OK_200
