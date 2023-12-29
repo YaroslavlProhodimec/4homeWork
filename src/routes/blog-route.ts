@@ -10,8 +10,9 @@ import {PostRepository} from "../repositories/post-repository";
 import {postValidation} from "../validators/post-validator";
 import {WithId} from "mongodb";
 import {BlogType} from "../types/blog/output";
-import {blogCollection} from "../index";
+import {blogCollection, postCollection} from "../index";
 import {blogMapper} from "../types/blog/mapper";
+import {postMapper} from "../types/post/mapper";
 
 type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>
 
@@ -74,7 +75,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         }
     }
 
-    const blogs: WithId<BlogType>[] = await blogCollection.find(filter)
+    const blogs: WithId<BlogType>[] = await postCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
         .limit(+pageSize)
@@ -95,7 +96,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
                 page:+pageNumber,
                 pageSize:+pageSize,
                 totalCount:+totalCount,
-                items:blogs.map(blogMapper)})
+                items:blogs.map(postMapper)})
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
