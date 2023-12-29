@@ -8,6 +8,10 @@ import {HTTP_STATUSES} from "../utils/common";
 import {RequestWithBodyAndParams, RequestWithQuery} from "../types/common";
 import {PostRepository} from "../repositories/post-repository";
 import {postValidation} from "../validators/post-validator";
+import {WithId} from "mongodb";
+import {BlogType} from "../types/blog/output";
+import {blogCollection} from "../index";
+import {blogMapper} from "../types/blog/mapper";
 
 type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>
 
@@ -24,13 +28,21 @@ blogRoute.get('/', async (req: RequestWithQuery<SortDataType>, res: Response) =>
     }
 
     const blogs = await BlogRepository.getAllBlogs(sortData)
+    console.log(blogs,'blogs')
     res.status(HTTP_STATUSES.OK_200).send(blogs)
     // res.send(blogs)
 })
 
 blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) => {
+    const sortData = {
+        searchNameTerm: req.query.searchNameTerm,
+        sortBy: req.query.sortBy,
+        sortDirection: req.query.sortDirection,
+        pageNumber: req.query.pageNumber,
+        pageSize: req.query.pageSize,
+    }
 
-    const blog = await BlogRepository.getBlogById(req.params.id)
+    const blog = await BlogRepository.getBlogById(req.params.id,sortData)
 
     if (blog) {
         res.status(HTTP_STATUSES.OK_200).json(blog)
@@ -42,12 +54,23 @@ blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) =>
 
 blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
     const id = req.params.id
-    const blog = await BlogRepository.getBlogById(id)
+    const sortData = {
+        searchNameTerm: req.query.searchNameTerm,
+        sortBy: req.query.sortBy,
+        sortDirection: req.query.sortDirection,
+        pageNumber: req.query.pageNumber,
+        pageSize: req.query.pageSize,
+    }
+    const blog = await BlogRepository.getBlogById(id
+        ,sortData
+    )
 
     if (blog) {
+        console.log(blog,'blog')
+
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
-        ).json(blog)
+        ).json({blog})
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -59,7 +82,8 @@ blogRoute.post('/',
     async (req: Request, res: Response) => {
 
         const blogID = await BlogRepository.createBlog(req.body)
-        const newBlog = await BlogRepository.getBlogById(blogID)
+        const newBlog = await BlogRepository.getBlogById(blogID,req.query)
+        console.log(newBlog,'newBlog')
         if (newBlog) {
             res.status(HTTP_STATUSES.CREATED_201).json(newBlog)
             return;
@@ -89,14 +113,14 @@ blogRoute.post('/',
         const id = req.params.id
         const {title, shortDescription, content} = req.body
 
-        const blog = await BlogRepository.getBlogById(id)
+        const blog = await BlogRepository.getBlogById(id,req.query)
 
         if (!blog) {
             res.send(404)
             return;
         }
 
-        const createdPostId = await BlogRepository.createPostToBlog(id, {title, shortDescription, content})
+        const createdPostId = await BlogRepository.createPostToBlog(id, {title, shortDescription, content},req.query)
         // const blogFound = await BlogRepository.getBlogById(id)
         // if (!blogFound) {
         //     res.sendStatus(404)

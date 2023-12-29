@@ -3,7 +3,7 @@ import {BlogType, OutputBlogType} from "./output";
 import {OutputPostType, PostType} from "../post/output";
 // import {BlogType, OutputBlogType} from "./output";
 
-export const blogMapper = (blog:WithId<BlogType>):OutputBlogType => {
+export const blogMapper = (blog:WithId<BlogType>):any => {
     return {
         id:blog._id.toString(),
         name:blog.name,

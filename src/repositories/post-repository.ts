@@ -9,7 +9,7 @@ import {BlogType} from "../types/blog/output";
 import {blogMapper} from "../types/blog/mapper";
 
 export class PostRepository {
-    static async getAllPostsQueryParam(sortData: SortDataType) {
+    static async getAllPostsQueryParam(sortData: any) {
 
         const sortDirection = sortData.sortDirection ?? 'desc'
         const sortBy = sortData.sortBy ?? 'createdAt'

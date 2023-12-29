@@ -28,12 +28,12 @@ export class BlogRepository {
             }
         }
 
-        const blogs: WithId<BlogType>[] = await blogCollection.find({filter})
+        const blogs: WithId<BlogType>[] = await blogCollection.find(filter)
             .sort(sortBy, sortDirection)
             .skip((+pageNumber - 1) * +pageSize)
             .limit(+pageSize)
             .toArray()
-
+        console.log(blogs,'blog   s')
          const totalCount = await blogCollection
              .countDocuments(filter)
 
@@ -87,14 +87,15 @@ export class BlogRepository {
         }
 
     }
-    static async createPostToBlog(blogId:string,postData:any){
-        const blog = await this.getBlogById(blogId)
+    static async createPostToBlog(blogId:string,postData:any,sortData:any){
+        const blog = await this.getBlogById(blogId,sortData,)
         // {"id":"658ecf37c9fe3dbe552d7186",
         //     "name":"new blog",
         //     "description":"description",
         //     "websiteUrl":"https://someurl.com",
         //     "createdAt":"2023-12-29T13:52:55.790Z",
         //     "isMembership":false
+
         const post:any = {
             title:postData.title,
             shortDescription:postData.shortDescription,
@@ -103,22 +104,108 @@ export class BlogRepository {
             blogName:blog!.name,
             createdAt: new Date(),
         }
+
         const res =     await postCollection.insertOne(post)
 
         return res.insertedId
     }
-    static async getBlogById(id: string): Promise<OutputBlogType | null> {
+    static async getBlogById(id: string,sortData:any
+    ): Promise<any | null> {
+        const sortDirection = sortData.sortDirection ?? 'desc'
+        const sortBy = sortData.sortBy ?? 'createdAt'
+        const searchNameTerm = sortData.searchNameTerm ?? null
+        const pageSize = sortData.pageSize ?? 10
+        const pageNumber = sortData.pageNumber ?? 1
+
+        let filter = {}
+
+        if (searchNameTerm) {
+            filter = {
+                name: {
+                    $regex: searchNameTerm,
+                    $options: 'i'
+                }
+            }
+        }
+
+        const blogs: WithId<BlogType>[] = await blogCollection.find(filter)
+            .sort(sortBy, sortDirection)
+            .skip((+pageNumber - 1) * +pageSize)
+            .limit(+pageSize)
+            .toArray()
+        console.log(blogs,'blog   s')
+        const totalCount = await blogCollection
+            .countDocuments(filter)
+
+        const pageCount = Math.ceil(totalCount / +pageSize)
+
+
         try {
+
             const blog: WithId<BlogType> | null = await blogCollection.findOne({_id: new ObjectId(id)})
             if (!blog) {
                 return null
             }
-            return blogMapper(blog)
+            // return blogMapper(blog)
+            return {
+                pagesCount:pageCount,
+                pageNumber:pageNumber,
+                pageSize:+pageSize,
+                totalCount:+totalCount,
+                items:blogs.map(blogMapper)
+            }
         } catch (err) {
             return null
         }
 
     }
+    // static async getBlogById(id: string,sortData:any): Promise<any | null> {
+    //     const sortDirection = sortData.sortDirection ?? 'desc'
+    //     const sortBy = sortData.sortBy ?? 'createdAt'
+    //     const searchNameTerm = sortData.searchNameTerm ?? null
+    //     const pageSize = sortData.pageSize ?? 10
+    //     const pageNumber = sortData.pageNumber ?? 1
+    //
+    //     let filter = {}
+    //
+    //     if (searchNameTerm) {
+    //         filter = {
+    //             name: {
+    //                 $regex: searchNameTerm,
+    //                 $options: 'i'
+    //             }
+    //         }
+    //     }
+    //
+    //     const blogs: WithId<BlogType>[] = await blogCollection.find({filter})
+    //         .sort(sortBy, sortDirection)
+    //         .skip((+pageNumber - 1) * +pageSize)
+    //         .limit(+pageSize)
+    //         .toArray()
+    //
+    //     const totalCount = await blogCollection
+    //         .countDocuments(filter)
+    //
+    //     const pageCount = Math.ceil(totalCount / +pageSize)
+    //
+    //         try {
+    //             const blog: any = await blogCollection.findOne({_id: new ObjectId(id)})
+    //             if (!blog) {
+    //
+    //                 return null
+    //             }
+    //             return {
+    //                 pagesCount:pageCount,
+    //                 pageNumber:pageNumber,
+    //                 pageSize:+pageSize,
+    //                 totalCount:+totalCount,
+    //                 items:blogs.map(blogMapper)
+    //             }
+    //         } catch (err) {
+    //             return null
+    //         }
+    //
+    // }
 
     static async createBlog(data: CreateBlogDto) {
 
