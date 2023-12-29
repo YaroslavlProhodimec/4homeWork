@@ -103,7 +103,9 @@ blogRoute.post('/:id/posts',
             return;
 
         }
-        res.status(HTTP_STATUSES.CREATED_201).send(post)
+        res.status(HTTP_STATUSES.OK_200
+            // CREATED_201
+        ).send(post)
     })
 
 blogRoute.delete('/:id', authMiddleware, idParamsValidation, async (req: Request<BlogParams>, res: Response) => {
