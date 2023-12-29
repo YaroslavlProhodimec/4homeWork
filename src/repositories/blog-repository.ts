@@ -1,0 +1,151 @@
+import {v4 as uuidv4} from 'uuid';
+import {BlogType, OutputBlogType} from "../types/blog/output";
+import {ObjectId, WithId} from "mongodb";
+import {CreateBlogDto, SortDataType, UpdateBlogDto} from "../types/blog/input";
+import {blogMapper} from "../types/blog/mapper";
+import {blogCollection, postCollection} from "../index";
+
+
+export class BlogRepository {
+
+    static async getAllBlogs(sortData: SortDataType) {
+
+        const sortDirection = sortData.sortDirection ?? 'desc'
+        const sortBy = sortData.sortBy ?? 'createdAt'
+        const searchNameTerm = sortData.searchNameTerm ?? null
+        const pageSize = sortData.pageSize ?? 10
+        const pageNumber = sortData.pageNumber ?? 1
+
+        let filter = {}
+
+        if (searchNameTerm) {
+            filter = {
+                name: {
+                    $regex: searchNameTerm,
+                    $options: 'i'
+                }
+            }
+        }
+
+        const blogs: WithId<BlogType>[] = await blogCollection.find({filter})
+            .sort(sortBy, sortDirection)
+            .skip((+pageNumber - 1) * +pageSize)
+            .limit(+pageSize)
+            .toArray()
+
+         const totalCount = await blogCollection
+             .countDocuments(filter)
+
+        const pageCount = Math.ceil(totalCount / +pageSize)
+
+        return {
+            pagesCount:pageCount,
+            pageNumber:pageNumber,
+            pageSize:+pageSize,
+            totalCount:+totalCount,
+            items:blogs.map(blogMapper)
+        }
+
+        // return blogs.map(blogMapper)
+
+    }
+
+    static  async  getPostsByBlogId(blogId:string,sortData:any){
+        const sortBy = sortData.sortBy ?? 'createAt'
+        const sortDirection = sortData.sortDirection ?? 'desc'
+        const pageNumber = sortData.pageNumber ?? 1
+        const pageSize = sortData.pageSize ?? 10
+
+        const posts = await postCollection
+            .find()
+            .sort(sortBy,sortDirection)
+            .skip((+pageNumber -1 ) / +pageSize)
+            .limit(+pageSize)
+            .toArray()
+
+
+        const totalCount = await postCollection
+            .countDocuments({blogId:blogId})
+
+        const  pagesCount = Math.ceil(totalCount / pageSize)
+
+        return {
+            pagesCount,
+            page:pageNumber,
+            pageSize,
+            totalCount,
+            items:posts.map((p:any)=>({
+                id:p._id,
+                title:p.title,
+                shortDescription:p.shortDescription,
+                content:p.content,
+                createdAt:p.createdAt,
+                blogName:p.blogName,
+                blogId:p.blogId,
+            }))
+        }
+
+    }
+    static async getBlogById(id: string): Promise<OutputBlogType | null> {
+        try {
+            const blog: WithId<BlogType> | null = await blogCollection.findOne({_id: new ObjectId(id)})
+            if (!blog) {
+                return null
+            }
+            return blogMapper(blog)
+        } catch (err) {
+            return null
+        }
+
+    }
+
+    static async createBlog(data: CreateBlogDto) {
+
+        const createdAt = new Date()
+        const newBlog: BlogType = {
+            ...data,
+            createdAt: createdAt.toISOString(),
+            isMembership: false
+        }
+        const result = await blogCollection.insertOne(newBlog)
+        return result.insertedId.toString()
+
+    }
+
+    static async updateBlog(id: string, data: UpdateBlogDto) {
+
+
+        let result = await blogCollection.updateOne({_id: new ObjectId(id)}, {
+            $set: {
+                name: data.name,
+                description: data.description,
+                websiteUrl: data.websiteUrl,
+            }
+        })
+        return result.matchedCount === 1
+    }
+
+    static async deleteBlog(id: string) {
+        try {
+            const result = await blogCollection.deleteOne({_id: new ObjectId(id)})
+            return result.deletedCount === 1
+        } catch (e) {
+            return false
+        }
+
+    }
+
+    static async deleteAllBlogs() {
+
+        const result = await blogCollection.deleteMany({})
+
+        return !!result.deletedCount
+    }
+
+}
+
+export function generateUniqueId(): string {
+    const fullUUID = uuidv4();
+    return fullUUID.slice(0, 28);
+}
+
