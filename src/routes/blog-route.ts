@@ -103,8 +103,8 @@ blogRoute.post('/:id/posts',
             return;
 
         }
-        res.status(HTTP_STATUSES.OK_200
-            // CREATED_201
+        res.status(HTTP_STATUSES.
+            CREATED_201
         ).send(post)
     })
 
