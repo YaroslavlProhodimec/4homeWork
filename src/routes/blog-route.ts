@@ -6,6 +6,7 @@ import {BlogParams, SortDataType} from "../types/blog/input";
 import {HTTP_STATUSES} from "../utils/common";
 // import {BlogService} from "../domain/blog-service";
 import {RequestWithBodyAndParams, RequestWithQuery} from "../types/common";
+import {PostRepository} from "../repositories/post-repository";
 
 type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>
 
@@ -43,7 +44,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
     const blog = await BlogRepository.getBlogById(id)
 
     if (blog) {
-        res.status(HTTP_STATUSES.OK_200).json(blog)
+        res.status(HTTP_STATUSES.CREATED_201).json(blog)
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -89,13 +90,18 @@ blogRoute.post('/:id/posts',
             res.send(404)
             return;
         }
-        // const created = await BlogService.createPostToBlog(id, {title, shortDescription, content})
-        const blogFound = await BlogRepository.getBlogById(id)
-        if (!blogFound) {
+        const createdPostId = await BlogRepository.createPostToBlog(id, {title, shortDescription, content})
+        // const blogFound = await BlogRepository.getBlogById(id)
+        // if (!blogFound) {
+        //     res.sendStatus(404)
+        // }
+        const post = await PostRepository.getPostById(createdPostId)
+        if (!post) {
             res.sendStatus(404)
-        }
+            return;
 
-        res.status(HTTP_STATUSES.OK_200).send(blog)
+        }
+        res.status(HTTP_STATUSES.OK_200).send(post)
     })
 
 blogRoute.delete('/:id', authMiddleware, idParamsValidation, async (req: Request<BlogParams>, res: Response) => {

@@ -4,6 +4,7 @@ import {ObjectId, WithId} from "mongodb";
 import {CreateBlogDto, SortDataType, UpdateBlogDto} from "../types/blog/input";
 import {blogMapper} from "../types/blog/mapper";
 import {blogCollection, postCollection} from "../index";
+import {shortDescriptionValidation} from "../validators/post-validator";
 
 
 export class BlogRepository {
@@ -85,6 +86,22 @@ export class BlogRepository {
             }))
         }
 
+    }
+    static async createPostToBlog(blogId:string,postData:any){
+        const blog = await this.getBlogById(blogId)
+
+        const post = {
+            title:postData.title,
+            shortDescription:postData.shortDescription,
+            content:postData.content,
+            blogId:postData.blogId,
+            blogName:blog!.name
+        }
+
+
+        const res =     await postCollection.insertOne(post)
+
+        return res.insertedId
     }
     static async getBlogById(id: string): Promise<OutputBlogType | null> {
         try {

@@ -14,7 +14,7 @@ export class PostRepository {
 
     }
 
-    static async getPostById(id: string): Promise<OutputPostType | null> {
+    static async getPostById(id: any): Promise<OutputPostType | null> {
         try {
             const post: any = await postCollection.findOne({_id: new ObjectId(id)})
             if (!post) {
