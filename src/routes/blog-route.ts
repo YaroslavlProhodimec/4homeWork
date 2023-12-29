@@ -75,8 +75,9 @@ blogRoute.post('/',
 //         res.send(blog)
 //     })
 
-blogRoute.post('/:id/posts',
+   blogRoute.post('/:id/posts',
     authMiddleware,
+       blogPostValidation(),
     async (req: RequestWithBodyAndParams<BlogParams, {
         title: string,
         shortDescription: string,
