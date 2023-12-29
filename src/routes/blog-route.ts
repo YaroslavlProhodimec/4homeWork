@@ -8,6 +8,9 @@ import {HTTP_STATUSES} from "../utils/common";
 import {RequestWithBodyAndParams, RequestWithQuery} from "../types/common";
 import {PostRepository} from "../repositories/post-repository";
 import {postValidation} from "../validators/post-validator";
+import {WithId} from "mongodb";
+import {BlogType} from "../types/blog/output";
+import {blogCollection} from "../index";
 
 type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>
 
@@ -42,12 +45,53 @@ blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) =>
 
 blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
     const id = req.params.id
+
     const blog = await BlogRepository.getBlogById(id)
+
+    const sortDirection = req.query.sortDirection ?? 'desc'
+    const sortBy = req.query.sortBy ?? 'createdAt'
+    const searchNameTerm = req.query.searchNameTerm ?? null
+    const pageSize = req.query.pageSize ?? 10
+    const pageNumber = req.query.pageNumber ?? 1
+
+    let filter = {}
+
+    if (searchNameTerm) {
+        filter = {
+            name: {
+                $regex: searchNameTerm,
+                $options: 'i'
+            }
+        }
+    }
+
+    const blogs: WithId<BlogType>[] = await blogCollection.find(
+        // {
+        filter
+        // }
+    )
+        .sort(sortBy, sortDirection)
+        .skip((+pageNumber - 1) * +pageSize)
+        .limit(+pageSize)
+        .toArray()
+
+    const totalCount = await blogCollection
+        .countDocuments(filter)
+
+    const pageCount = Math.ceil(totalCount / +pageSize)
+
+    console.log(blog,'blog')
 
     if (blog) {
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
-        ).json(blog)
+        ).json({
+
+                pagesCount:pageCount,
+                page:+pageNumber,
+                pageSize:+pageSize,
+                totalCount:+totalCount,
+            items:blog})
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
