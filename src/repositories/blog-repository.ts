@@ -28,7 +28,11 @@ export class BlogRepository {
             }
         }
 
-        const blogs: WithId<BlogType>[] = await blogCollection.find({filter})
+        const blogs: WithId<BlogType>[] = await blogCollection.find(
+            // {
+            filter
+        // }
+        )
             .sort(sortBy, sortDirection)
             .skip((+pageNumber - 1) * +pageSize)
             .limit(+pageSize)
