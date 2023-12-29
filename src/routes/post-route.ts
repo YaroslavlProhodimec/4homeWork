@@ -7,9 +7,22 @@ import {HTTP_STATUSES} from "../utils/common";
 
 
 export const postRoute = Router({})
-
+// старый вариант без пагинации
+// postRoute.get('/', async (req: Request, res: Response) => {
+//     const posts = await PostRepository.getAllPosts()
+//     res.status(HTTP_STATUSES.OK_200).json(posts)
+// })
+// new variants  with pagination
 postRoute.get('/', async (req: Request, res: Response) => {
-    const posts = await PostRepository.getAllPosts()
+    const sortData = {
+        searchNameTerm: req.query.searchNameTerm,
+        sortBy: req.query.sortBy,
+        sortDirection: req.query.sortDirection,
+        pageNumber: req.query.pageNumber,
+        pageSize: req.query.pageSize,
+    }
+
+    const posts = await PostRepository.getAllPostsQueryParam(sortData)
     res.status(HTTP_STATUSES.OK_200).json(posts)
 })
 postRoute.get('/:id', async (req: Request<BlogParams>, res: Response) => {

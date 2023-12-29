@@ -3,11 +3,54 @@ import {BlogRepository} from "./blog-repository";
 import {OutputPostType, PostType} from "../types/post/output";
 import {postMapper} from "../types/post/mapper";
 import {CreatePostDto, UpdatePostDto} from "../types/post/input";
-import {postCollection} from "../index";
+import {blogCollection, postCollection} from "../index";
+import {SortDataType} from "../types/blog/input";
+import {BlogType} from "../types/blog/output";
+import {blogMapper} from "../types/blog/mapper";
 
 export class PostRepository {
+    static async getAllPostsQueryParam(sortData: SortDataType) {
 
+        const sortDirection = sortData.sortDirection ?? 'desc'
+        const sortBy = sortData.sortBy ?? 'createdAt'
+        const searchNameTerm = sortData.searchNameTerm ?? null
+        const pageSize = sortData.pageSize ?? 10
+        const pageNumber = sortData.pageNumber ?? 1
+
+        let filter = {}
+
+        if (searchNameTerm) {
+            filter = {
+                name: {
+                    $regex: searchNameTerm,
+                    $options: 'i'
+                }
+            }
+        }
+
+        const post: any = await postCollection.find({filter})
+            .sort(sortBy, sortDirection)
+            .skip((+pageNumber - 1) * +pageSize)
+            .limit(+pageSize)
+            .toArray()
+
+        const totalCount = await postCollection
+            .countDocuments(filter)
+
+        const pageCount = Math.ceil(totalCount / +pageSize)
+
+        return {
+            pagesCount:pageCount,
+            pageNumber:pageNumber,
+            pageSize:+pageSize,
+            totalCount:+totalCount,
+            items:post.map(postMapper)
+        }
+
+
+    }
     static async getAllPosts() {
+
         const post: any = await postCollection.find({}).toArray()
 
         return post.map(postMapper)
