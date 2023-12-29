@@ -103,7 +103,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
                 pagesCount:pageCount,
                 page:+pageNumber,
                 pageSize:+pageSize,
-                totalCount:totalCount ,
+                totalCount:totalCount - 1,
                 items:blogs.map(postMapper)})
         return;
     } else {
