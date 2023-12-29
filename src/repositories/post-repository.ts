@@ -16,7 +16,9 @@ export class PostRepository {
 
     static async getPostById(id: any): Promise<OutputPostType | null> {
         try {
-            const post: any = await postCollection.findOne({_id: new ObjectId(id)})
+            const post: any = await postCollection.findOne({_id: new ObjectId(id),
+                // createdAt:new Date()
+            })
             if (!post) {
                 return null
             }

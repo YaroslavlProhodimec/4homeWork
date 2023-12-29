@@ -95,12 +95,13 @@ export class BlogRepository {
         //     "websiteUrl":"https://someurl.com",
         //     "createdAt":"2023-12-29T13:52:55.790Z",
         //     "isMembership":false
-        const post = {
+        const post:any = {
             title:postData.title,
             shortDescription:postData.shortDescription,
             content:postData.content,
             blogId:blogId,
-            blogName:blog!.name
+            blogName:blog!.name,
+            createdAt: new Date(),
         }
         const res =     await postCollection.insertOne(post)
 

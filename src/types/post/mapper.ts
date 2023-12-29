@@ -1,16 +1,18 @@
 import {WithId} from "mongodb";
 import {OutputPostType, PostType} from "../post/output";
 
-export const postMapper = (post:any):any => {
+export const postMapper = (post: any): any => {
+    console.log(post.createdAt)
+
     return {
-        id:post._id.toString(),
-        title:post.title,
-        shortDescription:post.shortDescription,
-        content:post.content,
-        blogId:post.blogId,
-        blogName:post.blogName,
-        createdAt:post.createdAt
-            // .
+        id: post._id.toString(),
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt
+        // .
         // toISOString()
     }
 }
