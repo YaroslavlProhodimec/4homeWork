@@ -9,7 +9,9 @@ export const postMapper = (post:any):any => {
         content:post.content,
         blogId:post.blogId,
         blogName:post.blogName,
-        createdAt:post.createdAt.toISOString()
+        createdAt:post.createdAt
+            // .
+        // toISOString()
     }
 }
 // Object {
