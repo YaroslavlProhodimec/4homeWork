@@ -132,13 +132,13 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         .limit(+pageSize)
         .toArray();
 
-    const totalCount = await blogCollection.countDocuments(filter);
+    const totalCount = await postCollection.countDocuments(filter);
     const pageCount = Math.ceil(+totalCount / +pageSize);
 
     console.log(blog, 'blog');
 
     if (blog) {
-        res.status(HTTP_STATUSES.OK_200).json({
+        res.status(HTTP_STATUSES.OK_200).send({
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,
