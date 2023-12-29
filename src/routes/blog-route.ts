@@ -11,6 +11,7 @@ import {postValidation} from "../validators/post-validator";
 import {WithId} from "mongodb";
 import {BlogType} from "../types/blog/output";
 import {blogCollection} from "../index";
+import {blogMapper} from "../types/blog/mapper";
 
 type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>
 
@@ -86,12 +87,11 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
         ).json({
-
                 pagesCount:pageCount,
                 page:+pageNumber,
                 pageSize:+pageSize,
                 totalCount:+totalCount,
-            items:blog})
+            items:blogs.map(blogMapper)})
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
