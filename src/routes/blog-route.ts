@@ -48,15 +48,25 @@ blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) =>
 blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
     const id = req.params.id
 
-    const blog = await BlogRepository.getBlogById(id)
+    // const blog = await BlogRepository.getBlogById(id)
+
+    // const sortData = {
+    //     searchNameTerm: req.query.searchNameTerm,
+    //     sortBy: req.query.sortBy,
+    //     sortDirection: req.query.sortDirection,
+    //     pageNumber: req.query.pageNumber,
+    //     pageSize: req.query.pageSize,
+    // }
+
+    const blog = await BlogRepository.getBlogById(id);
 
     const sortData = {
         searchNameTerm: req.query.searchNameTerm,
         sortBy: req.query.sortBy,
         sortDirection: req.query.sortDirection,
-        pageNumber: req.query.pageNumber,
-        pageSize: req.query.pageSize,
-    }
+        pageNumber: Number(req.query.pageNumber) || 1,
+        pageSize: Number(req.query.pageSize) || 10,
+    };
     const sortDirection = sortData.sortDirection ?? 'desc'
     const sortBy = sortData.sortBy ?? 'createdAt'
     const searchNameTerm = sortData.searchNameTerm ?? null
@@ -75,7 +85,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         }
     }
 
-    const blogs: WithId<BlogType>[] = await postCollection.find(filter)
+    const blogs: any = await postCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
         .limit(+pageSize)
