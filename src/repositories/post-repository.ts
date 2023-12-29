@@ -45,7 +45,7 @@ export class PostRepository {
 
         return {
             pagesCount:pageCount,
-            page:pageNumber,
+            page:+pageNumber,
             pageSize:+pageSize,
             totalCount:+totalCount,
             items:post.map(postMapper)

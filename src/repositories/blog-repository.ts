@@ -45,7 +45,7 @@ export class BlogRepository {
 
         return {
             pagesCount:pageCount,
-            page:pageNumber,
+            page:+pageNumber,
             pageSize:+pageSize,
             totalCount:+totalCount,
             items:blogs.map(blogMapper)
@@ -76,7 +76,7 @@ export class BlogRepository {
 
         return {
             pagesCount,
-            page:pageNumber,
+            page:+pageNumber,
             pageSize,
             totalCount,
             items:posts.map((p:any)=>({
