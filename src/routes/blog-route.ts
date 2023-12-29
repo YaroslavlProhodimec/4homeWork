@@ -72,7 +72,6 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
     const pageSize = sortData.pageSize ?? 10
     const pageNumber = sortData.pageNumber ?? 1
 
-
     let filter = {}
 
     if (searchNameTerm) {
@@ -83,7 +82,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
             }
         }
     }
-
+    console.log(pageNumber,'pageNumber')
     const blogs: any = await postCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
@@ -93,7 +92,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
     const totalCount = await blogCollection
         .countDocuments(filter)
 
-    const pageCount = Math.ceil(totalCount / +pageSize)
+    const pageCount = Math.ceil(+totalCount / +pageSize)
 
     console.log(blog,'blog')
 
