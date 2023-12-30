@@ -67,7 +67,9 @@ export class BlogRepository {
             .skip((+pageNumber - 1) * +pageSize)
             .limit(+pageSize)
             .toArray()
-
+if (!posts){
+    return  null
+}
 
         const totalCount = await postCollection
             .countDocuments({blogId: blogId})

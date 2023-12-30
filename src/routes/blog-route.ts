@@ -62,8 +62,8 @@ blogRoute.get('/:id/posts',
 
         const posts = await BlogRepository.getPostsByBlogId(id, sortData);
         // const blog = await BlogRepository.getBlogById(id,sortData);
-
-        if (!posts) {
+        // console.log(posts.,'posts')
+        if (posts!.items.length < 1) {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
             return;
         }
