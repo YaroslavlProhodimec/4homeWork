@@ -120,9 +120,9 @@ blogRoute.post('/:id/posts',
 
         const createdPostId = await BlogRepository.createPostToBlog(id, {title, shortDescription, content})
         // const blogFound = await BlogRepository.getBlogById(id)
-        // if (!blogFound) {
-        //     res.sendStatus(404)
-        // }
+        if (!blog) {
+            res.sendStatus(404)
+        }
         const post = await PostRepository.getPostById(createdPostId)
         console.log(post, 'post')
         if (!post) {

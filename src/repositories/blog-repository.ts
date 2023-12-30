@@ -77,6 +77,7 @@ export class BlogRepository {
         return {
             pagesCount,
             page: +pageNumber,
+            // pageSize: +pageSize,
             pageSize: +pageSize,
             totalCount,
             items: posts.map((p: any) => ({
