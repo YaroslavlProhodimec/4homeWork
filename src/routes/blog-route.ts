@@ -65,14 +65,14 @@ blogRoute.get('/:id/posts',
 
 
 
-    // if (blog) {
+    if (posts) {
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
         ).send(posts)
-        // return;
-    // } else {
-    //     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-    // }
+        return;
+    } else {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    }
 })
 
 blogRoute.post('/',
