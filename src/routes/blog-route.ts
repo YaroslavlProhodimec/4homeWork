@@ -62,9 +62,10 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         searchNameTerm: req.query.searchNameTerm,
         sortBy: req.query.sortBy,
         sortDirection: req.query.sortDirection,
-        pageNumber: Number(req.query.pageNumber) || 1,
-        pageSize: Number(req.query.pageSize) || 10,
-    };
+        pageNumber: req.query.pageNumber,
+        pageSize: req.query.pageSize,
+    }
+
 
     const sortDirection = sortData.sortDirection ?? 'desc'
     const sortBy = sortData.sortBy ?? 'createdAt'
@@ -82,7 +83,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
             }
         }
     }
-    console.log(pageNumber,'pageNumber')
+    console.log(pageNumber, 'pageNumber')
     const blogs: any = await postCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
@@ -91,20 +92,22 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
 
     const totalCount = await postCollection
         .countDocuments(filter)
-const result = totalCount - 1
+
     const pageCount = Math.ceil(totalCount / +pageSize)
 
-    console.log(blog,'blog')
+
+    console.log(blog, 'blog')
 
     if (blog) {
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
         ).json({
-                pagesCount:pageCount,
-                page:+pageNumber,
-                pageSize:+pageSize,
-                totalCount:result,
-                items:blogs.map(postMapper)})
+            pagesCount: pageCount,
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: totalCount,
+            items: blogs.map(postMapper)
+        })
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -133,10 +136,10 @@ blogRoute.post('/',
 //         res.send(blog)
 //     })
 
-   blogRoute.post('/:id/posts',
+blogRoute.post('/:id/posts',
     authMiddleware,
-       // blogPostValidation(),
-       postValidation(),
+    // blogPostValidation(),
+    postValidation(),
     async (req: RequestWithBodyAndParams<BlogParams, {
         title: string,
         shortDescription: string,
@@ -159,14 +162,13 @@ blogRoute.post('/',
         //     res.sendStatus(404)
         // }
         const post = await PostRepository.getPostById(createdPostId)
-        console.log(post,'post')
+        console.log(post, 'post')
         if (!post) {
             res.sendStatus(404)
             return;
 
         }
-        res.status(HTTP_STATUSES.
-            CREATED_201
+        res.status(HTTP_STATUSES.CREATED_201
         ).send(post)
     })
 
