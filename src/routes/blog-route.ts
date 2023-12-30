@@ -45,7 +45,9 @@ blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) =>
     }
 })
 
-blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
+blogRoute.get('/:id/posts',
+    // idParamsValidation,
+    async (req: Request, res: Response) => {
 
     const id = req.params.id
 
