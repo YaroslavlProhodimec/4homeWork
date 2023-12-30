@@ -57,47 +57,16 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         pageSize: req.query.pageSize,
     }
     // pagesCount=2&page=1&pageSize=10&totalCount=12
-    const blog = await BlogRepository.getBlogById(id);
-    const sortDirection = sortData.sortDirection ?? 'desc'
-    const sortBy = sortData.sortBy ?? 'createdAt'
-    const searchNameTerm = sortData.searchNameTerm ?? null
-    const pageSize = sortData.pageSize ?? 10
-    const pageNumber = sortData.pageNumber ?? 1
+    const blog = await BlogRepository.getPostsByBlogId(id,sortData);
 
-    let filter = {}
 
-    if (searchNameTerm) {
-        filter = {
-            name: {
-                $regex: searchNameTerm,
-                $options: 'i'
-            }
-        }
-    }
 
-    const blogs:any = await postCollection.find(filter)
-        .sort(sortBy, sortDirection)
-        .skip((+pageNumber - 1) * +pageSize)
-        .limit(+pageSize)
-        .toArray()
 
-    const totalCount = await postCollection
-        .countDocuments(
-            {id:id}
-            // filter
-        )
-    const pageCount = Math.ceil(totalCount / +pageSize)
 
     if (blog) {
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
-        ).send({
-            pagesCount: pageCount,
-            page: +pageNumber,
-            pageSize: +pageSize,
-            totalCount: totalCount,
-            items: blogs.map(postMapper)
-        })
+        ).send(blog)
         return;
     } else {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
