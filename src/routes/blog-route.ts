@@ -47,17 +47,6 @@ blogRoute.get('/:id', idParamsValidation, async (req: Request, res: Response) =>
 
 blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Response) => {
     const id = req.params.id
-    // const blog = await BlogRepository.getBlogById(id)
-    // const sortData = {
-    //     searchNameTerm: req.query.searchNameTerm,
-    //     sortBy: req.query.sortBy,
-    //     sortDirection: req.query.sortDirection,
-    //     pageNumber: req.query.pageNumber,
-    //     pageSize: req.query.pageSize,
-    // }
-
-    const blog = await BlogRepository.getBlogById(id);
-    // pagesCount":1,"page":1,"pageSize":10,"totalCount":3,
     const sortData = {
         searchNameTerm: req.query.searchNameTerm,
         sortBy: req.query.sortBy,
@@ -66,7 +55,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         pageSize: req.query.pageSize,
     }
 
-
+    const blog = await BlogRepository.getBlogById(id);
     const sortDirection = sortData.sortDirection ?? 'desc'
     const sortBy = sortData.sortBy ?? 'createdAt'
     const searchNameTerm = sortData.searchNameTerm ?? null
@@ -83,25 +72,26 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
             }
         }
     }
-    console.log(pageNumber, 'pageNumber')
-    const blogs: any = await postCollection.find(filter)
+
+    const blogs: WithId<BlogType>[] = await postCollection.find(
+        // {
+        filter
+        // }
+    )
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
         .limit(+pageSize)
         .toArray()
 
-    const totalCountOne = await postCollection
+    const totalCount = await postCollection
         .countDocuments(filter)
-    const totalCount = totalCountOne - 1
+
     const pageCount = Math.ceil(totalCount / +pageSize)
-
-
-    console.log(blog, 'blog')
 
     if (blog) {
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
-        ).json({
+        ).send({
             pagesCount: pageCount,
             page: +pageNumber,
             pageSize: +pageSize,
