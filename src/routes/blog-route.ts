@@ -49,31 +49,26 @@ blogRoute.get('/:id/posts',
     // idParamsValidation,
     async (req: Request, res: Response) => {
 
-    const id = req.params.id
+        const id = req.params.id
 
-    const sortData = {
-        sortBy: req.query.sortBy,
-        sortDirection: req.query.sortDirection,
-        pageNumber: req.query.pageNumber,
-        pageSize: req.query.pageSize,
-    }
+        const sortData = {
+            sortBy: req.query.sortBy,
+            sortDirection: req.query.sortDirection,
+            pageNumber: req.query.pageNumber,
+            pageSize: req.query.pageSize,
+        }
 
-    // pagesCount=2&page=1&pageSize=10&totalCount=12
+        // pagesCount=2&page=1&pageSize=10&totalCount=12
 
-    const posts = await BlogRepository.getPostsByBlogId(id,sortData);
-    // const blog = await BlogRepository.getBlogById(id,sortData);
+        const posts = await BlogRepository.getPostsByBlogId(id, sortData);
+        // const blog = await BlogRepository.getBlogById(id,sortData);
 
-    if (posts) {
-        res.status(HTTP_STATUSES.OK_200
-            // CREATED_201
-        ).send(posts)
-        return;
-    } else {
-        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-    }
-})
-
-
+        if (!posts) {
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+            return;
+        }
+        res.status(HTTP_STATUSES.OK_200).send(posts)
+    })
 
 
 blogRoute.post('/',
@@ -123,7 +118,9 @@ blogRoute.post('/:id/posts',
         if (!blog) {
             res.sendStatus(404)
         }
+
         const post = await PostRepository.getPostById(createdPostId)
+
         console.log(post, 'post')
         if (!post) {
             res.sendStatus(404)
