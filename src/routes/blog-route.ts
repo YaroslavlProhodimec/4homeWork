@@ -56,7 +56,7 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         pageNumber: req.query.pageNumber,
         pageSize: req.query.pageSize,
     }
-
+    // pagesCount=2&page=1&pageSize=10&totalCount=12
     const blog = await BlogRepository.getBlogById(id);
     const sortDirection = sortData.sortDirection ?? 'desc'
     const sortBy = sortData.sortBy ?? 'createdAt'
@@ -75,19 +75,17 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         }
     }
 
-    const blogs: WithId<BlogType>[] = await postCollection.find(
-        // {
-        filter
-        // }
-    )
+    const blogs:any = await postCollection.find(filter)
         .sort(sortBy, sortDirection)
         .skip((+pageNumber - 1) * +pageSize)
         .limit(+pageSize)
         .toArray()
 
     const totalCount = await postCollection
-        .countDocuments(filter)
-
+        .countDocuments(
+            {id:id}
+            // filter
+        )
     const pageCount = Math.ceil(totalCount / +pageSize)
 
     if (blog) {
