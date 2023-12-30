@@ -56,15 +56,15 @@ export class BlogRepository {
     }
 
     static  async  getPostsByBlogId(blogId:string,sortData:any){
-        const sortBy = sortData.sortBy ?? 'createAt'
+        const sortBy = sortData.sortBy ?? 'createdAt'
         const sortDirection = sortData.sortDirection ?? 'desc'
         const pageNumber = sortData.pageNumber ?? 1
         const pageSize = sortData.pageSize ?? 10
 
         const posts = await postCollection
-            .find()
+            .find({blogId:blogId})
             .sort(sortBy,sortDirection)
-            .skip((+pageNumber -1 ) / +pageSize)
+            .skip((+pageNumber -1 ) * +pageSize)
             .limit(+pageSize)
             .toArray()
 
@@ -72,7 +72,7 @@ export class BlogRepository {
         const totalCount = await postCollection
             .countDocuments({blogId:blogId})
 
-        const  pagesCount = Math.ceil(totalCount / pageSize)
+        const  pagesCount = Math.ceil(totalCount / +pageSize)
 
         return {
             pagesCount,

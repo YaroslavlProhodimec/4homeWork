@@ -50,27 +50,27 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
     const id = req.params.id
 
     const sortData = {
-        searchNameTerm: req.query.searchNameTerm,
         sortBy: req.query.sortBy,
         sortDirection: req.query.sortDirection,
         pageNumber: req.query.pageNumber,
         pageSize: req.query.pageSize,
     }
     // pagesCount=2&page=1&pageSize=10&totalCount=12
-    const blog = await BlogRepository.getPostsByBlogId(id,sortData);
+    const posts = await BlogRepository.getPostsByBlogId(id,sortData);
+    // const blog = await BlogRepository.getBlogById(id,sortData);
 
 
 
 
 
-    if (blog) {
+    // if (blog) {
         res.status(HTTP_STATUSES.OK_200
             // CREATED_201
-        ).send(blog)
-        return;
-    } else {
-        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
-    }
+        ).send(posts)
+        // return;
+    // } else {
+    //     res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+    // }
 })
 
 blogRoute.post('/',
