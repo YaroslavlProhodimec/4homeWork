@@ -57,13 +57,11 @@ blogRoute.get('/:id/posts',
         pageNumber: req.query.pageNumber,
         pageSize: req.query.pageSize,
     }
+
     // pagesCount=2&page=1&pageSize=10&totalCount=12
+
     const posts = await BlogRepository.getPostsByBlogId(id,sortData);
     // const blog = await BlogRepository.getBlogById(id,sortData);
-
-
-
-
 
     if (posts) {
         res.status(HTTP_STATUSES.OK_200
@@ -74,6 +72,9 @@ blogRoute.get('/:id/posts',
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
     }
 })
+
+
+
 
 blogRoute.post('/',
     authMiddleware, blogPostValidation(),

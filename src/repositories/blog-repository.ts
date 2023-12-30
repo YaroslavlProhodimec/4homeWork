@@ -31,67 +31,68 @@ export class BlogRepository {
         const blogs: WithId<BlogType>[] = await blogCollection.find(
             // {
             filter
-        // }
+            // }
         )
             .sort(sortBy, sortDirection)
             .skip((+pageNumber - 1) * +pageSize)
             .limit(+pageSize)
             .toArray()
 
-         const totalCount = await blogCollection
-             .countDocuments(filter)
+        const totalCount = await blogCollection
+            .countDocuments(filter)
 
         const pageCount = Math.ceil(totalCount / +pageSize)
 
         return {
-            pagesCount:pageCount,
-            page:+pageNumber,
-            pageSize:+pageSize,
-            totalCount:+totalCount,
-            items:blogs.map(blogMapper)
+            pagesCount: pageCount,
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: +totalCount,
+            items: blogs.map(blogMapper)
         }
 
         // return blogs.map(blogMapper)
 
     }
 
-    static  async  getPostsByBlogId(blogId:string,sortData:any){
+    static async getPostsByBlogId(blogId: string, sortData: any) {
         const sortBy = sortData.sortBy ?? 'createdAt'
         const sortDirection = sortData.sortDirection ?? 'desc'
         const pageNumber = sortData.pageNumber ?? 1
         const pageSize = sortData.pageSize ?? 10
 
         const posts = await postCollection
-            .find({blogId:blogId})
-            .sort(sortBy,sortDirection)
-            .skip((+pageNumber -1 ) * +pageSize)
+            .find({blogId: blogId})
+            .sort(sortBy, sortDirection)
+            .skip((+pageNumber - 1) * +pageSize)
             .limit(+pageSize)
             .toArray()
 
 
         const totalCount = await postCollection
-            .countDocuments({blogId:blogId})
+            .countDocuments({blogId: blogId})
 
-        const  pagesCount = Math.ceil(totalCount / +pageSize)
+        const pagesCount = Math.ceil(totalCount / +pageSize)
 
         return {
             pagesCount,
-            page:+pageNumber,
-            pageSize,
+            page: +pageNumber,
+            pageSize: +pageSize,
             totalCount,
-            items:posts.map((p:any)=>({
-                id:p._id,
-                title:p.title,
-                shortDescription:p.shortDescription,
-                content:p.content,
-                createdAt:p.createdAt,
-                blogName:p.blogName,
-                blogId:p.blogId,
+            items: posts.map((p: any) => ({
+                id: p._id,
+                title: p.title,
+                shortDescription: p.shortDescription,
+                content: p.content,
+                createdAt: p.createdAt,
+                blogName: p.blogName,
+                blogId: p.blogId,
             }))
         }
 
     }
-    static async createPostToBlog(blogId:string,postData:any){
+
+    static async createPostToBlog(blogId: string, postData: any) {
         const blog = await this.getBlogById(blogId)
         // {"id":"658ecf37c9fe3dbe552d7186",
         //     "name":"new blog",
@@ -99,18 +100,19 @@ export class BlogRepository {
         //     "websiteUrl":"https://someurl.com",
         //     "createdAt":"2023-12-29T13:52:55.790Z",
         //     "isMembership":false
-        const post:any = {
-            title:postData.title,
-            shortDescription:postData.shortDescription,
-            content:postData.content,
-            blogId:blogId,
-            blogName:blog!.name,
+        const post: any = {
+            title: postData.title,
+            shortDescription: postData.shortDescription,
+            content: postData.content,
+            blogId: blogId,
+            blogName: blog!.name,
             createdAt: new Date(),
         }
-        const res =     await postCollection.insertOne(post)
+        const res = await postCollection.insertOne(post)
 
         return res.insertedId
     }
+
     static async getBlogById(id: string): Promise<OutputBlogType | null> {
         try {
             const blog: WithId<BlogType> | null = await blogCollection.findOne({_id: new ObjectId(id)})
@@ -123,6 +125,7 @@ export class BlogRepository {
         }
 
     }
+
     // static async getBlogById(id: string,sortData:any): Promise<any | null> {
     //     const sortDirection = sortData.sortDirection ?? 'desc'
     //     const sortBy = sortData.sortBy ?? 'createdAt'
