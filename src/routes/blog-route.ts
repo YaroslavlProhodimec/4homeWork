@@ -90,10 +90,10 @@ blogRoute.get('/:id/posts', idParamsValidation, async (req: Request, res: Respon
         .limit(+pageSize)
         .toArray()
 
-    const totalCount = await postCollection
+    const totalCountOne = await postCollection
         .countDocuments(filter)
-
-    const pageCount = Math.ceil((totalCount - 1) / +pageSize)
+    const totalCount = totalCountOne - 1
+    const pageCount = Math.ceil(totalCount / +pageSize)
 
 
     console.log(blog, 'blog')
